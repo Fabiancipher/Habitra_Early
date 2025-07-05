@@ -22,9 +22,23 @@ public class App{
     public static Integer timeSelected, diffSelected;
 
     public static void main(String[] args) {
+        //Try to create a directory
+        try{
+            String userDirect= System.getProperty("user.dir");
+            File directory= new File(userDirect+File.separator+"Archivos");
+            if(directory.mkdir()){
+                System.out.println("Directory created");
+            }
+            else{
+                System.out.println("Directory already exists");
+            }
+        }catch(Exception x){
+            System.out.println("Cant create directory: "+x);
+        }
+
         //Try to create a text file
         try{
-            File archive= new File("archivo.txt");
+            File archive= new File("Archivos/archivo.txt");
             if(archive.createNewFile())
                 System.out.println("File created");
             else
@@ -33,7 +47,7 @@ public class App{
         catch(IOException e){
             System.out.println("Can't create file: "+e);
         }
-        
+
         startFrame();
         startButtons();
         //Set main panel
