@@ -49,7 +49,10 @@ public class Habit implements Item{
 
     /**Calculates experience */
     public void CalcExp(){
-        this.exp= 10*(diff*time);
+        if(getBad().equals(false))
+            this.exp= 10*(diff*time);
+        else
+            this.exp= -1*(10*(diff*time));
     }
     /**Returns habit data */
     public String toString(){

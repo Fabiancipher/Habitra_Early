@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.text.StyledEditorKit.BoldAction;
 
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
@@ -20,6 +19,9 @@ public class App{
     public static JList<String> habits= new JList<>(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
     public static JList<String> tasks= new JList<>(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
     public static Integer timeSelected, diffSelected;
+    public static String HF= "Archivos/habitos.txt";
+    public static String TF= "Archivos/tareas.txt";
+    public static String BHF= "Archivos/malos.txt";
 
     public static void main(String[] args) {
         //Try to create a directory
@@ -38,14 +40,34 @@ public class App{
 
         //Try to create a text file
         try{
-            File archive= new File("Archivos/archivo.txt");
-            if(archive.createNewFile())
-                System.out.println("File created");
+            File habitsFile= new File(HF);
+            if(habitsFile.createNewFile())
+                System.out.println("Habits file created");
             else
-                System.out.println("File already exists");
+                System.out.println("Habits file already exists");
         }
         catch(IOException e){
-            System.out.println("Can't create file: "+e);
+            System.out.println("Can't create habits file: "+e);
+        }
+        try{
+            File tasksFile= new File(TF);
+            if(tasksFile.createNewFile())
+                System.out.println("Tasks file created");
+            else
+                System.out.println("Tasks File Already exists");
+        }
+        catch(IOException x){
+            System.out.println("Can´t create tasks file: "+x);
+        }
+        try{
+            File tasksFile= new File(BHF);
+            if(tasksFile.createNewFile())
+                System.out.println("Bad habits file created");
+            else
+                System.out.println("Bad habits File Already exists");
+        }
+        catch(IOException b){
+            System.out.println("Can´t create bad habits file: "+b);
         }
 
         startFrame();
@@ -217,6 +239,7 @@ public class App{
         addB.setBounds(30, 700, 130, 60);
         addB.addActionListener(e -> {
             event(3);
+            System.out.println("Add Bad Habit button clicked");
         });
     }
     /**Creates an "add"*/
@@ -247,12 +270,15 @@ public class App{
             }
             if(success){
                 try{
-                writer= new FileWriter("archivo.txt",true);
-                writer.write(name.getText());
-                writer.close();
+                    writer= new FileWriter(HF,true);
+                    writer.write(newName+" ");
+                    writer.write(timeSelected+" ");
+                    writer.write(diffSelected+" ");
+                    writer.write(System.lineSeparator());
+                    writer.close();
                 }
                 catch(IOException x){
-                System.out.println("Impossible to write on file: "+x);
+                    System.out.println("Impossible to write on file: "+x);
                 }     
             }
             newPanel.setVisible(false);
@@ -283,12 +309,15 @@ public class App{
             }
             if(success){
                 try{
-                writer= new FileWriter("archivo.txt",true);
-                writer.write(name.getText());
-                writer.close();
+                    writer= new FileWriter(BHF,true);
+                    writer.write(newName+" ");
+                    writer.write(timeSelected+" ");
+                    writer.write(diffSelected+" ");
+                    writer.write(System.lineSeparator());
+                    writer.close();
                 }
                 catch(IOException x){
-                System.out.println("Impossible to write on file: "+x);
+                    System.out.println("Impossible to write on file: "+x);
                 }     
             }
             newPanel.setVisible(false);
@@ -320,8 +349,11 @@ public class App{
             }
             if(success){
                 try{
-                writer= new FileWriter("archivo.txt",true);
-                writer.write(name.getText());
+                writer= new FileWriter(TF,true);
+                writer.write(newName+" ");
+                writer.write(newDead+" ");
+                writer.write(diffSelected+" ");
+                writer.write(System.lineSeparator());
                 writer.close();
                 }
                 catch(IOException x){
@@ -388,25 +420,25 @@ public class App{
             timeSelected=3;
         });
 
-        monthly= new JButton("Monthly");
-        monthly.setBounds(725, 300, 100, 40);
-        monthly.setVisible(true);
-        monthly.addActionListener(e->{
-            selectTimeButton(monthly);
-            timeSelected=1;
-        });
-
         weekly= new JButton("Weekly");
-        weekly.setBounds(825, 300, 100, 40);
+        weekly.setBounds(725, 300, 100, 40);
         weekly.setVisible(true);
         weekly.addActionListener(e->{
             selectTimeButton(weekly);
             timeSelected=2;
         });
 
+        monthly= new JButton("Monthly");
+        monthly.setBounds(825, 300, 100, 40);
+        monthly.setVisible(true);
+        monthly.addActionListener(e->{
+            selectTimeButton(monthly);
+            timeSelected=1;
+        });
+
         newPanel.add(daily);
+        newPanel.add(weekly);  
         newPanel.add(monthly);
-        newPanel.add(weekly);
     }
 
     /**Initializes difficulty buttons */
