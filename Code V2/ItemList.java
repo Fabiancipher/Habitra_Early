@@ -1,8 +1,7 @@
+import java.util.*;
 /**This is a class that holds all items (Habits and tasks)
  * 
  */
-import java.util.*;
-
 public class ItemList{
     public List<Habit> habits;
     public List<Task> tasks;

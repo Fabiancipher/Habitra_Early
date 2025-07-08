@@ -8,11 +8,11 @@ public class Habit implements Item{
     private Boolean isBad;
 
     /**Constructor for habits
-     * @param name: The name of the habit
-     * @param time: Periodicy of the habit
-     * @param difficulty: The difficulty of the habit
-     * @param status: If the habit is completed or not
-     * @param bad: Wheter the habit is flagged as bad or not
+     * @param name The name of the habit
+     * @param time Periodicy of the habit
+     * @param difficult The difficulty of the habit
+     * @param status If the habit is completed or not
+     * @param bad Wheter the habit is flagged as bad or not
      */
     public Habit(String name, int time, int difficulty, boolean status, Boolean bad){
         this.habName= name;
@@ -31,6 +31,7 @@ public class Habit implements Item{
     }
 
     public Integer getExp(){
+        CalcExp();
         return this.exp;
     }
 
@@ -47,20 +48,24 @@ public class Habit implements Item{
         return this.status;
     }
 
-    /**Calculates experience */
+    /**Calculates experience <p>
+     * Checks if the habit is bad or not in order to add or substract experience
+     */
     public void CalcExp(){
         if(getBad().equals(false))
             this.exp= 10*(diff*time);
         else
-            this.exp= -1*(10*(diff*time));
+            this.exp= -(10*(diff*time));
     }
-    /**Returns habit data */
+    /**Returns habit data <p>
+     * Checks if the habit is flagged as bad or not
+     */
     public String toString(){
         String debug;
         if(getBad().equals(false))
-            debug= "HABIT\n"+"Name: "+habName+"\nTime: "+time+"\nDifficulty: "+diff+"\nBad?: No";
+            debug= "HABIT\n"+"Name: "+habName+"\nTime: "+time+"\nDifficulty: "+diff+"\nBad?: No\nEst.Experience: "+getExp();
         else
-            debug= "HABIT\n"+"Name: "+habName+"\nTime: "+time+"\nDifficulty: "+diff+"\nBad?: Yes";
+            debug= "HABIT\n"+"Name: "+habName+"\nTime: "+time+"\nDifficulty: "+diff+"\nBad?: Yes\nEst.Experience: "+getExp();
         return debug;
     }
 }
