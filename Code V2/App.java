@@ -9,7 +9,7 @@ public class App{
     //Declares objects as attributes, this helps to simply initiate them instead of declaring them every time we want one of these
     public static JPanel panel, newPanel;
     public static JFrame frame, popupFrame;
-    public static JButton addH, addT, addB, back, add,
+    public static JButton addH, addT, addB, back, chngH, add, mod,
     daily, weekly, monthly,
     easy, medium, hard;
     public static JTextField name, deadline;
@@ -98,6 +98,10 @@ public class App{
             case 3:
                 newPanel.setBackground(Color.decode("#2c118c"));
                 AddBadHabit();
+                break;
+            case 4:
+                newPanel.setBackground(Color.decode("#9b59b6"));
+                ChangeHabit();
                 break;
             default:
                 newPanel.setBackground(Color.RED);
@@ -210,6 +214,36 @@ public class App{
         newPanel.add(diff);
     }
 
+    private static void ChangeHabit(){
+        label = new JLabel("MODIFY HABIT");
+        label.setBounds(725, 20, 100, 20);
+        label.setVisible(true);
+
+        name = new JTextField();
+        name.setText("New Name : ");
+        name.setBounds(525, 100, 500, 100);
+        name.setVisible(true);
+        textDissapear(1);
+
+        time= new JLabel("New Time: ");
+        time.setBounds(525, 300, 100, 20);
+        time.setVisible(true);
+
+        diff= new JLabel();
+        diff.setText("New Difficulty: ");
+        diff.setBounds(525, 500, 100, 20);
+        diff.setVisible(true);
+
+        modButtonHabit();
+
+        startHabitButtons();
+        newPanel.add(label);
+        newPanel.add(name);
+        newPanel.add(time);
+        newPanel.add(diff);
+
+    }
+
     /**Starts the frame with a panel */
     private static void startFrame(){
         frame = new JFrame("Habitra");
@@ -241,12 +275,26 @@ public class App{
             event(3);
             System.out.println("Add Bad Habit button clicked");
         });
+
+        chngH= new JButton("ModHabit");
+        chngH.setBounds(30,525,160,80);
+        chngH.addActionListener(e -> {
+            event(4);
+            System.out.println("Mod Habit button clicked");
+        });
     }
     /**Creates an "add"*/
     private static void addButton(){
         add= new JButton("ADD!");
         add.setBounds(720, 700, 100, 60);
         add.setVisible(true);
+    }
+
+     /**Creates an "mod"*/
+    private static void modButton(){
+        mod= new JButton("MOD!");
+        mod.setBounds(720, 600, 100, 60);
+        mod.setVisible(true);
     }
 
     /**Creates an "add" button for habits */
@@ -365,6 +413,42 @@ public class App{
         });
         
         newPanel.add(add);
+    }
+
+     /**Creates a mod button for the habits */
+    private static void modButtonHabit(){
+        modButton();
+        mod.addActionListener(e ->{
+            popupFrame= new JFrame("Habit Modified");
+        String newName= name.getText();
+        Boolean success;
+            try{
+                Habit newHabit= new Habit(newName, timeSelected, diffSelected, false, false);
+                itemList.habits.add(newHabit);
+                habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));      
+                JOptionPane.showMessageDialog(popupFrame, "Habit modified!");
+                success= true;
+                System.out.println(newHabit.toString());
+            }
+            catch(Exception h){
+                JOptionPane.showMessageDialog(popupFrame, "Couldn´t mod habit");
+                success= false;
+            }
+            if(success){
+                try{
+                writer= new FileWriter("archivo.txt",true);
+                writer.write(name.getText());
+                writer.close();
+                }
+                catch(IOException x){
+                System.out.println("Impossible to write on file: "+x);
+                }     
+            }
+            newPanel.setVisible(false);
+            panel.setVisible(true);
+        });
+        
+        newPanel.add(mod);
     }
 
     private static void textDissapear(int id){
