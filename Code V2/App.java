@@ -12,6 +12,8 @@ public class App{
      * <p>
      * Add: A default button for the other three
      * <p>
+     * Mod: A default button for modyfing items
+     * <p>
      * AddH: Adds habits, 
      * AddT: Adds Tasks, 
      * AddB: Adds Bad Habits, 
@@ -20,7 +22,7 @@ public class App{
      * <p>
      * Easy, Medium, Hard: Difficulty buttons, determine DiffSelected
      */
-    public static JButton addH, addT, addB, back, add,
+    public static JButton addH, addT, addB, back, add, mod, modH,
     daily, weekly, monthly,
     easy, medium, hard;
     public static JTextField name, deadline;
@@ -47,6 +49,7 @@ public class App{
         panel.add(addH);
         panel.add(addT);
         panel.add(addB);
+        panel.add(modH);
 
         panel.setBackground(Color.decode("#472287"));
 
@@ -72,6 +75,8 @@ public class App{
                 newPanel.setBackground(Color.decode("#2c118c"));
                 AddBadHabit();
                 break;
+            case 4:
+                ChangeHabit();
             default:
                 newPanel.setBackground(Color.RED);
                 JLabel error= new JLabel("Something went wrong, please restart");
@@ -125,7 +130,7 @@ public class App{
         newPanel.add(name);
         newPanel.add(time);
         newPanel.add(diff);
-
+        showHabitsInPanel();
     }
 
     /**Creates a Panel for adding tasks */
@@ -220,7 +225,23 @@ public class App{
             redirectEvent(3);
             System.out.println("Add Bad Habit button clicked");
         });
+
+        modH= new JButton("ModHabit");
+        modH.setBounds(30, 400, 100, 60);
+        modH.addActionListener(e->{
+            redirectEvent(4);
+            System.out.println("Mod button clicked");
+        });
     }
+
+    /**  Update the list of habits */
+    public static void showHabitsInPanel() {
+        habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
+        JScrollPane scroll = new JScrollPane(habits);
+        scroll.setBounds(350, 100, 800, 500);
+        panel.add(scroll);
+    }
+
     /**Creates an "add" button
      * <p>
      * This is a generic button
@@ -229,6 +250,79 @@ public class App{
         add= new JButton("ADD!");
         add.setBounds(720, 700, 100, 60);
         add.setVisible(true);
+    }
+
+    /**Creates an "mod"*/
+    private static void modButton(){
+        mod= new JButton("MOD!");
+        mod.setBounds(720, 700, 100, 60);
+        mod.setVisible(true);
+    }
+
+    private static void ChangeHabit(){
+        label = new JLabel("MODIFY HABIT");
+        label.setBounds(725, 20, 100, 20);
+        label.setVisible(true);
+
+        name = new JTextField();
+        name.setText("New Name : ");
+        name.setBounds(525, 100, 500, 100);
+        name.setVisible(true);
+        textDissapear(1);
+
+        time= new JLabel("New Time: ");
+        time.setBounds(525, 300, 100, 20);
+        time.setVisible(true);
+
+        diff= new JLabel();
+        diff.setText("New Difficulty: ");
+        diff.setBounds(525, 500, 100, 20);
+        diff.setVisible(true);
+
+        modButtonHabit();
+
+        startHabitButtons();
+        newPanel.add(label);
+        newPanel.add(name);
+        newPanel.add(time);
+        newPanel.add(diff);
+        
+    }
+
+    /**Creates a mod button for the habits */
+    private static void modButtonHabit(){
+        modButton();
+        mod.addActionListener(e ->{
+            popupFrame= new JFrame("Habit Modified");
+            String newName= name.getText();
+            Boolean success;
+            try{
+                Habit newHabit= new Habit(newName, timeSelected, diffSelected, false, false);
+                itemList.habits.add(newHabit);
+                habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));      
+                JOptionPane.showMessageDialog(popupFrame, "Habit modified!");
+                success= true;
+                System.out.println(newHabit.toString());
+            }
+            catch(Exception h){
+                JOptionPane.showMessageDialog(popupFrame, "Couldn´t mod habit");
+                success= false;
+            }
+            if(success){
+                try{
+                writer= new FileWriter(HF,true);
+                writer.write(name.getText());
+                writer.close();
+                }
+                catch(IOException x){
+                System.out.println("Impossible to write on file: "+x);
+                }     
+            }
+            newPanel.setVisible(false);
+            panel.setVisible(true);
+        });
+        
+        newPanel.add(mod);
     }
 
     /**Creates an "add" button for habits */
