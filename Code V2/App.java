@@ -582,6 +582,7 @@ public class App{
                     }
                     line= reader.readLine();
                 }
+                System.out.println("Habits file readed");
             }catch(IOException k){
                 System.out.println("Couldn't read file: "+k);
             }
@@ -619,6 +620,7 @@ public class App{
                     }
                     line= reader.readLine();
                 }
+                System.out.println("Tasks file readed");
             }catch(IOException k){
                 System.out.println("Couldn't read file: "+k);
             }
@@ -657,6 +659,7 @@ public class App{
                     }
                     line= reader.readLine();
                 }
+                System.out.println("Bad habits file readed");
             }catch(IOException k){
                 System.out.println("Couldn't read file: "+k);
             }
