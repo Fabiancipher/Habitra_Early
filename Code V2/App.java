@@ -60,8 +60,8 @@ public class App{
             System.out.println("Can´t create tasks file: "+x);
         }
         try{
-            File tasksFile= new File(BHF);
-            if(tasksFile.createNewFile())
+            File badHabitsFile= new File(BHF);
+            if(badHabitsFile.createNewFile())
                 System.out.println("Bad habits file created");
             else
                 System.out.println("Bad habits File Already exists");
@@ -70,18 +70,21 @@ public class App{
             System.out.println("Can´t create bad habits file: "+b);
         }
 
+        loadHabitsFromFile();
+        
         startFrame();
         startButtons();
+
         //Set main panel
         panel.setLayout(null);
         panel.add(addH);
         panel.add(addT);
         panel.add(addB);
-
+        showHabitsInPanel();
         panel.setBackground(Color.decode("#472287"));
 
     }
-    /**Redirects to the corresponfing panel */
+    /**Redirects to the corresponding panel */
     private static void event(int id){
         panel.setVisible(false);
         newPanel = new JPanel();
@@ -256,21 +259,21 @@ public class App{
     /**Starts the buttons */
     private static void startButtons(){
         addH= new JButton("AddHabit");
-        addH.setBounds(30, 500, 100, 60);
+        addH.setBounds(30, 500, 160, 80);
         addH.addActionListener(e -> {
             event(1);
             System.out.println("Add Habit button clicked");
         });
         
         addT= new JButton("AddTask");
-        addT.setBounds(30, 600, 100, 60);
+        addT.setBounds(30, 600, 160, 80);
         addT.addActionListener(e -> {
             event(2);
             System.out.println("Add Task button clicked");
         });
 
         addB= new JButton("AddBadHabit");
-        addB.setBounds(30, 700, 130, 60);
+        addB.setBounds(30, 700, 160, 80);
         addB.addActionListener(e -> {
             event(3);
             System.out.println("Add Bad Habit button clicked");
@@ -579,4 +582,73 @@ public class App{
             }
         }
     }
+
+    /**  Update the list of habits */
+    public static void showHabitsInPanel() {
+        habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
+        JScrollPane scroll = new JScrollPane(habits);
+        scroll.setBounds(350, 100, 800, 500);
+        panel.add(scroll);
+    }
+
+    /**Read the Habits txt and saves the characteristics of each one */
+    public static void loadHabitsFromFile() {
+        File file = new File(HF);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(" ");
+                if (parts.length >= 3) {
+                    String name = parts[0];
+                    int time = Integer.parseInt(parts[1]);
+                    int difficulty = Integer.parseInt(parts[2]);
+                    Habit habit = new Habit(name, time, difficulty, false, false);
+                    itemList.habits.add(habit);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading habits: " + e);
+        }
+    }
+
+    /**Read the Bad Habits txt and saves the characteristics of each one */
+    public static void loadBadHabitsFromFile() {
+        File file = new File(BHF);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(" ");
+                if (parts.length >= 3) {
+                    String name = parts[0];
+                    int time = Integer.parseInt(parts[1]);
+                    int difficulty = Integer.parseInt(parts[2]);
+                    Habit habit = new Habit(name, time, difficulty, false, true);
+                    itemList.habits.add(habit);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading habits: " + e);
+        }
+    }
+
+    /**Read the Tasks txt and saves the characteristics of each one */
+    public static void loadTasksFromFile() {
+        File file = new File(TF);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(" ");
+                if (parts.length >= 3) {
+                    String name = parts[0];
+                    String deadline = parts[1];
+                    int difficulty = Integer.parseInt(parts[2]);
+                    Task task = new Task(name, deadline , difficulty, false);
+                    itemList.tasks.add(task);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading habits: " + e);
+        }
+    }
+
 }
