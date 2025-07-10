@@ -48,6 +48,12 @@ public class Task implements Item{
     }
     /**Returns task data */
     public String toString(){
-        return "TASK\n"+"Name: "+taskName+"\nDeadline: "+deadline+"\nDifficulty: "+diff+"\nEst.Experience: "+getExp();
+        String diffString="";
+        switch(diff){
+            case 1: diffString= "Easy"; break;
+            case 2: diffString= "Medium"; break;
+            case 3: diffString= "Hard"; break;
+        }
+        return "TASK \n "+"Name: "+taskName+"\nDeadline: "+deadline+"\nDifficulty: "+diffString+"\n Est.Experience: "+getExp();
     }
 }

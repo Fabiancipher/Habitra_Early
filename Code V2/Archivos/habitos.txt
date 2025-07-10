@@ -1,4 +1,2 @@
-Sas|3|1
-A|3|2
-B|3|3
-C|1|1
+Drink Water|3|1|
+Train|3|3|

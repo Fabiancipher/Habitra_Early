@@ -1,10 +1,13 @@
 import javax.swing.*;
-
+import java.lang.Math;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.*;
+import java.awt.Image;
+import java.awt.Toolkit;
 
 public class App{
     private static JPanel panel, newPanel;
@@ -12,8 +15,6 @@ public class App{
     /**JButton objects
      * <p>
      * Add: A default button for the other three
-     * <p>
-     * Mod: A default button for modyfing items
      * <p>
      * AddH: Adds habits, 
      * AddT: Adds Tasks, 
@@ -23,11 +24,12 @@ public class App{
      * <p>
      * Easy, Medium, Hard: Difficulty buttons, determine DiffSelected
      * <p>
-     * Complete: A button for completing habits
+     * Change: A button for changing between JScrolls
      */
-    private static JButton addH, addT, addB, back, add, mod, modH,
+    private static JButton addH, addT, addB, back, add,
     daily, weekly, monthly,
-    easy, medium, hard;
+    easy, medium, hard,
+    change;
     private static JTextField name, deadline;
     private static JLabel label, time, diff;
     private static FileWriter writer;
@@ -38,9 +40,11 @@ public class App{
     private static String HF= "Archivos/habitos.txt";
     private static String TF= "Archivos/tareas.txt";
     private static String BHF= "Archivos/malos.txt";
-    private static String userDirect= System.getProperty("user.dir"); //Obtains where the user is currently storing the app
-    private static File directory, habitsFile, tasksFile, badHabitsFile;
-    private static int acuExperience, levelUps=1, levelTreshold;
+    private static String UDF= "Archivos/usuario.txt";
+    private static File directory, habitsFile, tasksFile, badHabitsFile, userData;
+    private static int acuExperience, levelUps, levelTreshold;
+    private static JScrollPane scroll, taskScroll;
+    private static boolean showingHabits=true;
 
     public static void main(String[] args) {
         createFiles();
@@ -53,12 +57,10 @@ public class App{
         panel.add(addH);
         panel.add(addT);
         panel.add(addB);
-        panel.add(modH);
+        panel.add(change);
         showHabitsInPanel();
 
         panel.setBackground(Color.decode("#472287"));
-
-
     }
     /**Redirects to one of three Panels: habits, tasks and bad habits.
      * @param id An integer that controls which new panel should be loaded: 1= Habits, 2= Taks, 3= Bad Habits.
@@ -80,8 +82,6 @@ public class App{
                 newPanel.setBackground(Color.decode("#2c118c"));
                 AddBadHabit();
                 break;
-            case 4:
-                ChangeHabit();
             default:
                 newPanel.setBackground(Color.RED);
                 JLabel error= new JLabel("Something went wrong, please restart");
@@ -107,25 +107,39 @@ public class App{
         frame.repaint();
     }
 
+    /**Changes JScrolls */
+    private static void dissapearScroll(){
+        if(showingHabits){
+            showTasksInPanel();
+        }
+        else{
+            showHabitsInPanel();
+        }
+    }
+
     /**Creates a Panel for adding habits */
     private static void AddHabit(){
         label = new JLabel("ADD HABIT");
-        label.setBounds(725, 20, 100, 20);
+        label.setBounds(710, 20, 200, 40);
         label.setVisible(true);
+        label.setFont(new Font("Serif", Font.PLAIN, 25));
 
         name = new JTextField();
         name.setText("Name : ");
         name.setBounds(525, 100, 500, 100);
+        name.setFont(new Font("Serif", Font.BOLD, 15));
         name.setVisible(true);
         textDissapear(1);
 
         time= new JLabel("Time: ");
-        time.setBounds(525, 300, 100, 20);
+        time.setBounds(480, 315, 100, 20);
+        time.setFont(new Font("Serif", Font.BOLD, 18));
         time.setVisible(true);
 
         diff= new JLabel();
         diff.setText("Difficulty: ");
-        diff.setBounds(525, 500, 100, 20);
+        diff.setBounds(450, 515, 100, 20);
+        diff.setFont(new Font("Serif", Font.BOLD, 18));;
         diff.setVisible(true);
 
         addButtonHabit();
@@ -140,22 +154,26 @@ public class App{
     /**Creates a Panel for adding tasks */
     private static void AddTask(){
         label = new JLabel("ADD TASK");
-        label.setBounds(725, 20, 100, 20);
+        label.setBounds(710, 20, 200, 40);
         label.setVisible(true);
+        label.setFont(new Font("Serif", Font.PLAIN, 25));
 
         name = new JTextField();
         name.setText("Name : ");
         name.setBounds(525, 100, 500, 100);
+        name.setFont(new Font("Serif", Font.BOLD, 15));
         name.setVisible(true);
         textDissapear(1);
 
         deadline= new JTextField("Deadline : ");
         deadline.setBounds(525, 300, 500, 100);
+        deadline.setFont(new Font("Serif", Font.BOLD, 15));
         deadline.setVisible(true);
         textDissapear(2);
 
         diff= new JLabel("Difficulty: ");
-        diff.setBounds(525, 500, 100, 20);
+        diff.setBounds(450, 515, 100, 20);
+        diff.setFont(new Font("Serif", Font.BOLD, 18));;
         diff.setVisible(true);
 
         addButtonTask();
@@ -170,23 +188,28 @@ public class App{
     /**Creates a Panel for adding bad habits */
     private static void AddBadHabit(){
         label = new JLabel("ADD BAD HABIT");
+        label.setBounds(670, 20, 200, 40);
         label.setForeground(Color.decode("#f0e9e9"));
-        label.setBounds(725, 20, 100, 20);
         label.setVisible(true);
+        label.setFont(new Font("Serif", Font.PLAIN, 25));
 
         name = new JTextField("Name : ");
         name.setBounds(525, 100, 500, 100);
+        name.setFont(new Font("Serif", Font.BOLD, 15));
         name.setVisible(true);
         textDissapear(1);
 
         time= new JLabel("Time: ");
         time.setForeground(Color.decode("#f0e9e9"));
-        time.setBounds(525, 300, 500, 20);
+        time.setBounds(480, 315, 100, 20);
+        time.setFont(new Font("Serif", Font.BOLD, 18));
         time.setVisible(true);
 
-        diff= new JLabel("Difficulty: ");  
+        diff= new JLabel();
         diff.setForeground(Color.decode("#f0e9e9"));
-        diff.setBounds(525, 500, 500, 20);
+        diff.setText("Difficulty: ");
+        diff.setBounds(450, 515, 100, 20);
+        diff.setFont(new Font("Serif", Font.BOLD, 18));;
         diff.setVisible(true);
 
         addButtonBadHabit();
@@ -204,8 +227,18 @@ public class App{
         panel = new JPanel();
         frame.setSize(1920,1080);
         frame.setVisible(true);
+        Image icon = Toolkit.getDefaultToolkit().getImage("Icon.png");
+        frame.setIconImage(icon);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(panel);
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+            try{
+                saveUserData();
+                System.out.println("Data saved");
+            }catch(Exception e){
+                System.err.println("Could not save user data: "+e);
+            }
+        }));
     }
     /**Starts the buttons */
     private static void startButtons(){
@@ -230,46 +263,129 @@ public class App{
             System.out.println("Add Bad Habit button clicked");
         });
 
-        modH= new JButton("ModHabit");
-        modH.setBounds(30, 400, 100, 60);
-        modH.addActionListener(e->{
-            redirectEvent(4);
-            System.out.println("Mod button clicked");
+        change= new JButton("Switch");
+        change.setBounds(1425, 10, 100, 60);
+        change.addActionListener(e->{
+            dissapearScroll();
+            System.out.println("Change button clicked");
         });
     }
 
     /**Update the list of habits*/
     public static void showHabitsInPanel() {
+        if (scroll != null) { //Checks if a panel already exists and removes it
+            panel.remove(scroll);
+        }
+        if (taskScroll != null) {
+            panel.remove(taskScroll);
+        }
         habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
-        habits.setBackground(Color.decode("#a677ae"));
+        habits.setBackground(Color.decode("#a670ea"));
         controlSelectHabits();
-        JScrollPane scroll = new JScrollPane(habits);
-        scroll.setBounds(165, 0, 1900, 1090);
-        scroll.getViewport().setBackground(Color.decode("#a677ae"));
+        scroll = new JScrollPane(habits);
+        scroll.setBounds(165, 70, 1700, 1090);
+        scroll.getViewport().setBackground(Color.decode("#a670ea"));
         panel.add(scroll);
+        showingHabits= true;
+
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    /**Update the list of tasks*/
+    public static void showTasksInPanel() {
+        if (scroll != null) { //Checks if a panel already exists and removes it
+            panel.remove(scroll);
+        }
+        if (taskScroll != null) {
+            panel.remove(taskScroll);
+        }
+
+        tasks.setListData(itemList.tasks.stream().map(Task::toString).toArray(String[]::new));
+        tasks.setBackground(Color.decode("#a670ea"));
+        controlSelectTasks();
+        taskScroll = new JScrollPane(tasks);
+        taskScroll.setBounds(165, 70, 1700, 1090);
+        taskScroll.getViewport().setBackground(Color.decode("#a670ea"));
+        panel.add(taskScroll);
+        showingHabits= false;
+
+        panel.revalidate();
+        panel.repaint();
     }
 
     /**Controls how experience is granted when an habit is selected and completed */
     private static void controlSelectHabits(){ 
         habits.addListSelectionListener(e->{
+            habits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); //Prevents double firing events
+            if(e.getValueIsAdjusting())
+                return;
             int idx= habits.getSelectedIndex();
             if(idx>=0){
                 Habit selectedHabit= itemList.habits.get(idx);
                 acuExperience+=selectedHabit.getExp(); //Accumulates
-                levelTreshold= 100*(levelUps*levelUps); //Treshold calculus
+                if(levelUps!=0)//Checks if the user is at level 0
+                    levelTreshold= 100*(levelUps*levelUps); //Treshold calculus
+                else
+                    levelTreshold= 100;
                 int toGoExp= levelTreshold-acuExperience; //How much is needed
-                JOptionPane.showMessageDialog(popupFrame, selectedHabit.getName()+" was completed!");
-                JOptionPane.showMessageDialog(popupFrame, "You were granted: "+selectedHabit.getExp()+" experience points");
-                JOptionPane.showMessageDialog(popupFrame, "You now have: "+acuExperience+" experience points.");
-                if(toGoExp>0){
-                    JOptionPane.showMessageDialog(popupFrame, "You still need: "+toGoExp+ " to level up.");
+                if(!selectedHabit.getBad()){
+                    JOptionPane.showMessageDialog(popupFrame, selectedHabit.getName()+" was completed!");
+                    JOptionPane.showMessageDialog(popupFrame, "You were granted: "+selectedHabit.getExp()+" experience points");
+                    JOptionPane.showMessageDialog(popupFrame, "You now have: "+acuExperience+" experience points.");
+                    if(toGoExp>0){
+                        JOptionPane.showMessageDialog(popupFrame, "You still need: "+toGoExp+ " to level up.");
+                    }
+                    else if(toGoExp<=0){
+                        levelUps++; //Ups level
+                        toGoExp=0; //No more to go! Restarts variable
+                        JOptionPane.showMessageDialog(popupFrame, "You just leveled up!");
+                        JOptionPane.showMessageDialog(popupFrame, "Current level: "+levelUps);
+                    }
                 }
-                else if(toGoExp<=0){
-                    levelUps++; //Ups level
-                    toGoExp=0; //No more to go! Restarts variable
-                    JOptionPane.showMessageDialog(popupFrame, "You just leveled up!");
-                    JOptionPane.showMessageDialog(popupFrame, "Current level: "+levelUps);
+                else{
+                    JOptionPane.showMessageDialog(popupFrame, selectedHabit.getName()+" was completed");
+                    JOptionPane.showMessageDialog(popupFrame, "Some bandits stole: "+Math.abs(selectedHabit.getExp())+" experience points from you!");
+                    JOptionPane.showMessageDialog(popupFrame, "You now have: "+acuExperience+" experience points.");
+                    if(acuExperience<0){
+                        levelUps--;
+                        acuExperience=0;
+                        JOptionPane.showMessageDialog(popupFrame, "You just lost a level!");
+                        JOptionPane.showMessageDialog(popupFrame, "Current level: "+levelUps);
+                    }
                 }
+                selectItem();
+            }
+        });
+    }
+
+     /**Controls how experience is granted when a task is selected and completed */
+    private static void controlSelectTasks(){ 
+        tasks.addListSelectionListener(e->{
+            tasks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); //Prevents double firing
+            if(e.getValueIsAdjusting())
+                return;
+            int idx= tasks.getSelectedIndex();
+            if(idx>=0){
+                Task selectedTask= itemList.tasks.get(idx);
+                acuExperience+=selectedTask.getExp(); //Accumulates
+                if(levelUps!=0)//Checks if the user is at level 0
+                    levelTreshold= 100*(levelUps*levelUps); //Treshold calculus
+                else
+                    levelTreshold= 100;
+                int toGoExp= levelTreshold-acuExperience; //How much is needed
+                    JOptionPane.showMessageDialog(popupFrame, selectedTask.getName()+" was completed!");
+                    JOptionPane.showMessageDialog(popupFrame, "You were granted: "+selectedTask.getExp()+" experience points");
+                    JOptionPane.showMessageDialog(popupFrame, "You now have: "+acuExperience+" experience points.");
+                    if(toGoExp>0){
+                        JOptionPane.showMessageDialog(popupFrame, "You still need: "+toGoExp+ " to level up.");
+                    }
+                    else if(toGoExp<=0){
+                        levelUps++; //Ups level
+                        toGoExp=0; //No more to go! Restarts variable
+                        JOptionPane.showMessageDialog(popupFrame, "You just leveled up!");
+                        JOptionPane.showMessageDialog(popupFrame, "Current level: "+levelUps);
+                    }
                 selectItem();
             }
         });
@@ -298,81 +414,21 @@ public class App{
     */
     private static void addButton(){
         add= new JButton("ADD!");
-        add.setBounds(720, 700, 100, 60);
+        add.setFont(new Font("",Font.BOLD, 20));
+        add.setBounds(705, 675, 150, 60);
         add.setVisible(true);
     }
 
-    /**Creates an "mod"*/
-    private static void modButton(){
-        mod= new JButton("MOD!");
-        mod.setBounds(720, 700, 100, 60);
-        mod.setVisible(true);
-    }
-
-    private static void ChangeHabit(){
-        label = new JLabel("MODIFY HABIT");
-        label.setBounds(725, 20, 100, 20);
-        label.setVisible(true);
-
-        name = new JTextField();
-        name.setText("New Name : ");
-        name.setBounds(525, 100, 500, 100);
-        name.setVisible(true);
-        textDissapear(1);
-
-        time= new JLabel("New Time: ");
-        time.setBounds(525, 300, 100, 20);
-        time.setVisible(true);
-
-        diff= new JLabel();
-        diff.setText("New Difficulty: ");
-        diff.setBounds(525, 500, 100, 20);
-        diff.setVisible(true);
-
-        modButtonHabit();
-
-        startHabitButtons();
-        newPanel.add(label);
-        newPanel.add(name);
-        newPanel.add(time);
-        newPanel.add(diff);
-        
-    }
-
-    /**Creates a mod button for the habits */
-    private static void modButtonHabit(){
-        modButton();
-        mod.addActionListener(e ->{
-            popupFrame= new JFrame("Habit Modified");
-            String newName= name.getText();
-            Boolean success;
-            try{
-                Habit newHabit= new Habit(newName, timeSelected, diffSelected, false, false);
-                itemList.habits.add(newHabit);
-                habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));      
-                JOptionPane.showMessageDialog(popupFrame, "Habit modified!");
-                success= true;
-                System.out.println(newHabit.toString());
-            }
-            catch(Exception h){
-                JOptionPane.showMessageDialog(popupFrame, "Couldn´t mod habit");
-                success= false;
-            }
-            if(success){
-                try{
-                writer= new FileWriter(HF,true);
-                writer.write(name.getText());
-                writer.close();
-                }
-                catch(IOException x){
-                System.out.println("Impossible to write on file: "+x);
-                }     
-            }
-            newPanel.setVisible(false);
-            panel.setVisible(true);
-        });
-        
-        newPanel.add(mod);
+    private static void saveUserData(){
+        try{
+            writer= new FileWriter(UDF,false);
+            writer.write(acuExperience+"|");
+            writer.write(levelUps+"|");
+            writer.write(System.lineSeparator());
+            writer.close();
+        }catch(IOException e){
+            System.out.println("Could not save data: "+e);
+        }
     }
 
     /**Creates an "add" button for habits */
@@ -400,7 +456,7 @@ public class App{
                     writer= new FileWriter(HF,true);
                     writer.write(newName+"|");
                     writer.write(timeSelected+"|");
-                    writer.write(diffSelected);
+                    writer.write(diffSelected+"|");
                     writer.write(System.lineSeparator());
                     writer.close();
                 }
@@ -439,7 +495,7 @@ public class App{
                     writer= new FileWriter(BHF,true);
                     writer.write(newName+"|");
                     writer.write(timeSelected+"|");
-                    writer.write(diffSelected);
+                    writer.write(diffSelected+"|");
                     writer.write(System.lineSeparator());
                     writer.close();
                 }
@@ -479,7 +535,7 @@ public class App{
                 writer= new FileWriter(TF,true);
                 writer.write(newName+"|");
                 writer.write(newDead+"|");
-                writer.write(diffSelected);
+                writer.write(diffSelected+"|");
                 writer.write(System.lineSeparator());
                 writer.close();
                 }
@@ -546,7 +602,8 @@ public class App{
     /**Initializes time buttons */
     public static void startTimeButtons(){
         daily= new JButton("Daily");
-        daily.setBounds(625, 300, 100, 40);
+        daily.setBounds(530, 300, 150, 50);
+        daily.setFont(new Font("", Font.PLAIN, 25));
         daily.setVisible(true);
         daily.addActionListener(e->{
             selectTimeButton(daily);
@@ -554,7 +611,8 @@ public class App{
         });
 
         weekly= new JButton("Weekly");
-        weekly.setBounds(725, 300, 100, 40);
+        weekly.setBounds(705, 300, 150, 50);
+        weekly.setFont(new Font("", Font.PLAIN, 25));
         weekly.setVisible(true);
         weekly.addActionListener(e->{
             selectTimeButton(weekly);
@@ -562,7 +620,8 @@ public class App{
         });
 
         monthly= new JButton("Monthly");
-        monthly.setBounds(825, 300, 100, 40);
+        monthly.setBounds(875, 300, 150, 50);
+        monthly.setFont(new Font("", Font.PLAIN, 25));
         monthly.setVisible(true);
         monthly.addActionListener(e->{
             selectTimeButton(monthly);
@@ -577,7 +636,8 @@ public class App{
     /**Initializes difficulty buttons */
     public static void startDiffButtons(){
         easy= new JButton("Easy");
-        easy.setBounds(625, 500, 100, 40);
+        easy.setBounds(530, 500, 150, 50);
+        easy.setFont(new Font("", Font.PLAIN, 25));
         easy.setVisible(true);
         easy.addActionListener(e->{
             selectDiffButton(easy);
@@ -585,7 +645,8 @@ public class App{
         });
 
         medium= new JButton("Medium");
-        medium.setBounds(725, 500, 100, 40);
+        medium.setBounds(705, 500, 150, 50);
+        medium.setFont(new Font("", Font.PLAIN, 25));
         medium.setVisible(true);
         medium.addActionListener(e->{
             selectDiffButton(medium);
@@ -593,7 +654,8 @@ public class App{
         });
 
         hard= new JButton("Hard");
-        hard.setBounds(825, 500, 100, 40);
+        hard.setBounds(875, 500, 150, 50);
+        hard.setFont(new Font("", Font.PLAIN, 25));
         hard.setVisible(true);
         hard.addActionListener(e->{
             selectDiffButton(hard);
@@ -644,10 +706,12 @@ public class App{
      */
     private static void createFiles(){
         //Try to create a directory
-        directory= new File(userDirect);
+        directory= new File("Archivos");
         habitsFile= new File(HF);
         tasksFile= new File(TF);
         badHabitsFile= new File(BHF);
+        userData= new File(UDF);
+        //Try to create a directory
         try{
             if(directory.mkdir()){
                 System.out.println("Directory created");
@@ -687,6 +751,15 @@ public class App{
         catch(IOException b){
             System.out.println("Can´t create bad habits file: "+b);
         }
+        try{
+            if(userData.createNewFile())
+                System.out.println("User data file created");
+            else
+                System.out.println("User data File Already exists");
+        }
+        catch(IOException b){
+            System.out.println("Can´t create user data file: "+b);
+        }
     }
     /**Reads from all files in the "Archivos" directory. <p>
      * Creates an object for each valid line readed, and adds it to the objects list.
@@ -695,6 +768,7 @@ public class App{
         readHabits();
         readTasks();
         readBadHabits();
+        readUser();
         System.out.println("Files readed");
     }
     /**Reads from "habitos.txt". <p>
@@ -804,6 +878,38 @@ public class App{
                     line= reader.readLine();
                 }
                 System.out.println("Bad habits file readed");
+            }catch(IOException k){
+                System.out.println("Couldn't read file: "+k);
+            }
+            reader.close();
+        }catch(IOException f){
+            System.out.println("Can't generate reader: "+f);
+        }
+    }
+    /**Reads from "usuario.txt". <p>
+     * Initiates acuExperience and levelUps variables. <p>
+     */
+    private static void readUser(){
+        try{
+            BufferedReader reader= new BufferedReader(new FileReader(userData));
+            try{
+                String line= reader.readLine();
+                while(line!=null){ //Reads all lines in the file
+                    String[] mapped= line.split("\\|"); //Identifies a tube("|") as a split point
+                    if(mapped.length==2){ //Checks if the format is correct, since the file is easily modifiable
+                        int readedAcu= Integer.parseInt(mapped[0]);
+                        int readedLevel= Integer.parseInt(mapped[1]);
+                        acuExperience= readedAcu;
+                        levelUps= readedLevel;
+                        System.out.println("Current exp: "+acuExperience);
+                        System.out.println("Current level: "+levelUps);
+                    }
+                    else{
+                        System.out.println("Invalid format for user data, restarting");
+                    }
+                    line= reader.readLine();
+                }
+                System.out.println("User data file readed");
             }catch(IOException k){
                 System.out.println("Couldn't read file: "+k);
             }
