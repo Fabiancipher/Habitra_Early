@@ -21,10 +21,13 @@ public class App{
      * Daily, Weekly, Monthly: Time buttons, determine TimeSelected
      * <p>
      * Easy, Medium, Hard: Difficulty buttons, determine DiffSelected
+     * <p>
+     * Complete: A button for completing habits
      */
     public static JButton addH, addT, addB, back, add, mod, modH,
     daily, weekly, monthly,
-    easy, medium, hard;
+    easy, medium, hard,
+    complete;
     public static JTextField name, deadline;
     public static JLabel label, time, diff;
     public static FileWriter writer;
@@ -50,6 +53,7 @@ public class App{
         panel.add(addT);
         panel.add(addB);
         panel.add(modH);
+        showHabitsInPanel();
 
         panel.setBackground(Color.decode("#472287"));
 
@@ -130,7 +134,6 @@ public class App{
         newPanel.add(name);
         newPanel.add(time);
         newPanel.add(diff);
-        showHabitsInPanel();
     }
 
     /**Creates a Panel for adding tasks */
@@ -237,8 +240,10 @@ public class App{
     /**  Update the list of habits */
     public static void showHabitsInPanel() {
         habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
+        habits.setBackground(Color.decode("#a677ae"));
         JScrollPane scroll = new JScrollPane(habits);
-        scroll.setBounds(350, 100, 800, 500);
+        scroll.setBounds(165, 0, 1900, 1090);
+        scroll.getViewport().setBackground(Color.decode("#a677ae"));
         panel.add(scroll);
     }
 
@@ -348,9 +353,9 @@ public class App{
             if(success){ //If added correctly, write to file
                 try{
                     writer= new FileWriter(HF,true);
-                    writer.write(newName+" ");
-                    writer.write(timeSelected+" ");
-                    writer.write(diffSelected+" ");
+                    writer.write(newName+"|");
+                    writer.write(timeSelected+"|");
+                    writer.write(diffSelected);
                     writer.write(System.lineSeparator());
                     writer.close();
                 }
@@ -387,9 +392,9 @@ public class App{
             if(success){ //If added correctly, write to file
                 try{
                     writer= new FileWriter(BHF,true);
-                    writer.write(newName+" ");
-                    writer.write(timeSelected+" ");
-                    writer.write(diffSelected+" ");
+                    writer.write(newName+"|");
+                    writer.write(timeSelected+"|");
+                    writer.write(diffSelected);
                     writer.write(System.lineSeparator());
                     writer.close();
                 }
@@ -427,9 +432,9 @@ public class App{
             if(success){ //Writes to file
                 try{
                 writer= new FileWriter(TF,true);
-                writer.write(newName+" ");
-                writer.write(newDead+" ");
-                writer.write(diffSelected+" ");
+                writer.write(newName+"|");
+                writer.write(newDead+"|");
+                writer.write(diffSelected);
                 writer.write(System.lineSeparator());
                 writer.close();
                 }
@@ -657,7 +662,7 @@ public class App{
             try{
                 String line= reader.readLine();
                 while(line!=null){ //Reads all lines in the file
-                    String[] mapped= line.split(" "); //Identifies a space(" ") as a split point
+                    String[] mapped= line.split("\\|"); //Identifies a tube("|") as a split point
                     if(mapped.length==3){ //Checks if the format is correct, since the file is easily modifiable
                         String readedName= mapped[0];
                         int readedTIme= Integer.parseInt(mapped[1]);
@@ -695,7 +700,7 @@ public class App{
             try{
                 String line= reader.readLine();
                 while(line!=null){ //Reads all lines in file
-                    String[] mapped= line.split(" "); //Identifies a space(" ") as a split point
+                    String[] mapped= line.split("\\|"); //Identifies a tube("|") as a split point
                     if(mapped.length==3){ //Checks if the format is correct, since the file is easily modifiable
                         String readedName= mapped[0];
                         String readedDead= mapped[1];
@@ -734,7 +739,7 @@ public class App{
             try{
                 String line= reader.readLine();
                 while(line!=null){ //Reads all lines in the file
-                    String[] mapped= line.split(" "); //Identifies a space(" ") as a split point
+                    String[] mapped= line.split("\\|"); //Identifies a tube("|") as a split point
                     if(mapped.length==3){ //Checks if the format is correct, since the file is easily modifiable
                         String readedName= mapped[0];
                         int readedTIme= Integer.parseInt(mapped[1]);

@@ -63,9 +63,9 @@ public class Habit implements Item{
     public String toString(){
         String debug;
         if(getBad().equals(false))
-            debug= "HABIT\n"+"Name: "+habName+"\nTime: "+time+"\nDifficulty: "+diff+"\nBad?: No\nEst.Experience: "+getExp();
+            debug= "HABIT \n "+"Name: "+habName+"\n Time: "+time+"\n Difficulty: "+diff+"\n Bad?: No\n Est.Experience: "+getExp();
         else
-            debug= "HABIT\n"+"Name: "+habName+"\nTime: "+time+"\nDifficulty: "+diff+"\nBad?: Yes\nEst.Experience: "+getExp();
+            debug= "HABIT \n "+"Name: "+habName+"\n Time: "+time+"\n Difficulty: "+diff+"\n Bad?: Yes\n Est.Experience: "+getExp();
         return debug;
     }
 }
