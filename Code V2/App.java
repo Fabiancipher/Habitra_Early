@@ -1,13 +1,14 @@
 import javax.swing.*;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.*;
 
 public class App{
-    public static JPanel panel, newPanel;
-    public static JFrame frame, popupFrame;
+    private static JPanel panel, newPanel;
+    private static JFrame frame, popupFrame;
     /**JButton objects
      * <p>
      * Add: A default button for the other three
@@ -24,22 +25,22 @@ public class App{
      * <p>
      * Complete: A button for completing habits
      */
-    public static JButton addH, addT, addB, back, add, mod, modH,
+    private static JButton addH, addT, addB, back, add, mod, modH,
     daily, weekly, monthly,
-    easy, medium, hard,
-    complete;
-    public static JTextField name, deadline;
-    public static JLabel label, time, diff;
-    public static FileWriter writer;
-    public static ItemList itemList= new ItemList();
-    public static JList<String> habits= new JList<>(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
-    public static JList<String> tasks= new JList<>(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
-    public static Integer timeSelected, diffSelected;
-    public static String HF= "Archivos/habitos.txt";
-    public static String TF= "Archivos/tareas.txt";
-    public static String BHF= "Archivos/malos.txt";
-    public static String userDirect= System.getProperty("user.dir"); //Obtains where the user is currently storing the app
-    public static File directory, habitsFile, tasksFile, badHabitsFile;
+    easy, medium, hard;
+    private static JTextField name, deadline;
+    private static JLabel label, time, diff;
+    private static FileWriter writer;
+    private static ItemList itemList= new ItemList();
+    private static JList<String> habits= new JList<>(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
+    private static JList<String> tasks= new JList<>(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
+    private static Integer timeSelected, diffSelected;
+    private static String HF= "Archivos/habitos.txt";
+    private static String TF= "Archivos/tareas.txt";
+    private static String BHF= "Archivos/malos.txt";
+    private static String userDirect= System.getProperty("user.dir"); //Obtains where the user is currently storing the app
+    private static File directory, habitsFile, tasksFile, badHabitsFile;
+    private static int acuExperience, levelUps=1, levelTreshold;
 
     public static void main(String[] args) {
         createFiles();
@@ -237,14 +238,58 @@ public class App{
         });
     }
 
-    /**  Update the list of habits */
+    /**Update the list of habits*/
     public static void showHabitsInPanel() {
         habits.setListData(itemList.habits.stream().map(Habit::toString).toArray(String[]::new));
         habits.setBackground(Color.decode("#a677ae"));
+        controlSelectHabits();
         JScrollPane scroll = new JScrollPane(habits);
         scroll.setBounds(165, 0, 1900, 1090);
         scroll.getViewport().setBackground(Color.decode("#a677ae"));
         panel.add(scroll);
+    }
+
+    /**Controls how experience is granted when an habit is selected and completed */
+    private static void controlSelectHabits(){ 
+        habits.addListSelectionListener(e->{
+            int idx= habits.getSelectedIndex();
+            if(idx>=0){
+                Habit selectedHabit= itemList.habits.get(idx);
+                acuExperience+=selectedHabit.getExp(); //Accumulates
+                levelTreshold= 100*(levelUps*levelUps); //Treshold calculus
+                int toGoExp= levelTreshold-acuExperience; //How much is needed
+                JOptionPane.showMessageDialog(popupFrame, selectedHabit.getName()+" was completed!");
+                JOptionPane.showMessageDialog(popupFrame, "You were granted: "+selectedHabit.getExp()+" experience points");
+                JOptionPane.showMessageDialog(popupFrame, "You now have: "+acuExperience+" experience points.");
+                if(toGoExp>0){
+                    JOptionPane.showMessageDialog(popupFrame, "You still need: "+toGoExp+ " to level up.");
+                }
+                else if(toGoExp<=0){
+                    levelUps++; //Ups level
+                    toGoExp=0; //No more to go! Restarts variable
+                    JOptionPane.showMessageDialog(popupFrame, "You just leveled up!");
+                    JOptionPane.showMessageDialog(popupFrame, "Current level: "+levelUps);
+                }
+                selectItem();
+            }
+        });
+    }
+
+    /**Turns the selected item in the list to a certain color<p>
+     * It literally just does that
+     */
+    private static void selectItem(){    
+        habits.setCellRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> habits, Object value, int index, boolean isSelected, boolean cellHasFocus){
+                JLabel label = (JLabel) super.getListCellRendererComponent(habits, value, index, isSelected, cellHasFocus);   
+                if(isSelected){
+                    label.setBackground(Color.decode("#5df542"));
+                    label.setEnabled(false);
+                } 
+                return label;
+            }
+        });
     }
 
     /**Creates an "add" button
